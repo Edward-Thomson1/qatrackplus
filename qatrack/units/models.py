@@ -82,12 +82,29 @@ class UnitClass(models.Model):
         """Display more descriptive name"""
         return self.name
 
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+
+
+class UnitsiteManager(models.Manager): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    def get_by_natural_key(self, name, model, site_name=None):
+        return self.get(name=name, model=model, site__name=site_name)
 
 class Site(models.Model):
     """ Site unit resides
 
     Allows for multiple site filtering (different campuses, buildings, hospitals, etc)
     """
+
+    # department = models.ForeignKey(
+    #     Department,
+    #     null=True,
+    #     blank=True,
+    #     on_delete=models.PROTECT,
+    #     verbose_name=_l("department"),
+    # )
+
     name = models.CharField(
         verbose_name=_l("name"),
         max_length=64,
@@ -101,15 +118,91 @@ class Site(models.Model):
         unique=True,
     )
 
-    class Meta:
-        ordering = ("name",)
-        verbose_name = _l("site")
-        verbose_name_plural = _l("sites")
+   
+    # objects = UnitsiteManager()
+
+    # class Meta:
+    #     unique_together=[('name','department')]
+    #     ordering = ("name",'department')
+    #     verbose_name = _l("site")
+    #     verbose_name_plural = _l("sites")
 
     def __str__(self):
         return self.name
+    
+
+   
+    # def natural_key(self):
+    #     department = self.department.natural_key() if self.department else ()
+        
+    #     return (self.name) + department 
+    
+    # natural_key.dependencies = ["units.department"]
+
+    # def __str__(self):
+    #     """Display more descriptive name"""
+    #     return '%s%s' % (self.name, ' - %s' % self.department if self.department else '')
+
+class Department(models.Model): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    """ department of Unit
+
+    Stores information (just name for now) of unit department.
+    """
+    site = models.ForeignKey(
+        Site,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        verbose_name=_l("site"),
+    )
+
+    name = models.CharField(
+        verbose_name=_l("name"),
+        max_length=64,
+        unique=True,
+        help_text=_l('Name of this department'),
+    )
+
+    slug = models.SlugField(
+        verbose_name=_l("slug"),
+        max_length=50,
+        help_text=_l("Unique identifier made of lowercase characters and underscores for this site"),
+        unique=True,
+    )
+    
+
+    objects = UnitsiteManager()
 
 
+    class Meta:
+        unique_together=[('site','name')]
+        ordering = ("site",'name')
+        verbose_name = _l("department")
+        verbose_name_plural = _l("departments")
+
+    def natural_key(self):
+        site = self.site.natural_key() if self.site else ()
+        
+        return (site) + self.name 
+    
+    natural_key.dependencies = ["units.department"]
+
+    def __str__(self):
+        """Display more descriptive name"""
+        return '%s%s' % (self.site.name, ' - %s' % self.name if self.name else '')
+
+    # class Meta:
+    #     ordering = ("name",)
+    #     verbose_name = _l("Department")
+    #     verbose_name_plural = _l("Departments")
+
+    # def natural_key(self):
+    #     return (self.name,)
+
+    # def __str__(self):
+    #     """Display more descriptive name"""
+    #     return self.name
+#--------------------------------------------------------------------------------------------------------------------------------------------------
 class UnitTypeManager(models.Manager):
 
     def get_by_natural_key(self, name, model, vendor_name=None, unitclass_name=None):
@@ -221,6 +314,7 @@ class Unit(models.Model):
     """
     type = models.ForeignKey(UnitType, verbose_name=_l("Unit Type"), on_delete=models.PROTECT)
     site = models.ForeignKey(Site, null=True, blank=True, on_delete=models.PROTECT)
+    department = models.ForeignKey(Department, null=True, blank=True, on_delete=models.PROTECT)
 
     number = models.PositiveIntegerField(
         null=False,
@@ -231,6 +325,7 @@ class Unit(models.Model):
     name = models.CharField(max_length=256, help_text=_l('The display name for this unit'))
     serial_number = models.CharField(max_length=256, null=True, blank=True, help_text=_l('Optional serial number'))
     location = models.CharField(max_length=256, null=True, blank=True, help_text=_l('Optional location information'))
+    #room = models.CharField(max_length=256, null=True, blank=True, help_text=_l('Optional Room information')) #!!!!!!!!!!!!!!!!!!!!!!!
     install_date = models.DateField(null=True, blank=True, help_text=_l('Optional install date'))
     date_acceptance = models.DateField(
         verbose_name=_l("Acceptance date"),
@@ -254,6 +349,9 @@ class Unit(models.Model):
 
     def site_unit_name(self):
         return "%s :: %s" % (_("Other") if not self.site else self.site.name, self.name)
+    
+    # def location_unit_name(self): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    #     return "%s :: %s" % (_("Other") if not self.location else self.location.name, self.name)
 
     def get_potential_time(self, date_from, date_to):
 

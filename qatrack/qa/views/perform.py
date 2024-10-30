@@ -911,12 +911,14 @@ class ChooseUnit(TemplateView):
             q = q.values(
                 'unit',
                 'unit__type__name',
+                'unit__location',#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 'unit__type__collapse',
                 'unit__name',
                 'unit__number',
                 'unit__id',
                 'unit__site__slug',
                 'unit__site__name',
+                'unit__department__name',
             ).order_by(units_ordering).distinct()
 
             freq_qs = models.Frequency.objects.prefetch_related('unittestcollections__unit').all()
@@ -933,10 +935,11 @@ class ChooseUnit(TemplateView):
 
                 if unit['unit__site__name']:
                     key = (unit['unit__site__slug'], unit['unit__site__name'])
-                    unit_site_types[key][(unit["unit__type__name"], unit["unit__type__collapse"])].append(unit)
+                    #unit_site_types[key][(unit["unit__name"], unit["unit__type__collapse"])].append(unit)
+                    unit_site_types[key][(unit["unit__department__name"],unit["unit__type__name"], unit['unit__type__collapse'])].append(unit)#!!!!!!!!!!!!!!!
                 else:
                     unit_site_types[('zzzNonezzz', 'zzzNonezzz')][
-                        (unit['unit__type__name'], unit['unit__type__collapse'])
+                        (unit['unit__site__department__name'],unit["unit__type__name"], unit['unit__type__collapse'])#!!!!!!!!!!!!!
                     ].append(unit)
 
             ordered = {}
@@ -965,7 +968,7 @@ class ChooseUnit(TemplateView):
                     'slug', 'name'
                 )
                 unit['categories'] = get_unit_categories(unit['unit__id'])
-                unit_types[(unit["unit__type__name"], unit["unit__type__collapse"])].append(unit)
+                unit_types[(unit["unit__type__name"],unit["unit__location"], unit["unit__type__collapse"])].append(unit)#!!!!!!!!!!!!!!
 
             ordered = sorted(list(unit_types.items()), key=lambda x: min([u[units_ordering] for u in x[1]]))
             context['split_sites'] = False

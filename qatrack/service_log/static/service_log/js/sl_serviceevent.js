@@ -70,7 +70,7 @@ require(['jquery', 'lodash', 'moment', 'autosize', 'select2', 'flatpickr', 'sl_u
         // General fields ------------------------------------------------------------------------------
         autosize($('textarea.autosize'));
 
-        var s2 = $('.select2:visible, #template-modal .select2:not(#template_unit)').select2({
+        $('.select2:visible, #template-modal .select2:not(#template_unit)').select2({
             minimumResultsForSearch: 10,
             width: '100%',
             templateSelection: function(a) {
@@ -86,13 +86,7 @@ require(['jquery', 'lodash', 'moment', 'autosize', 'select2', 'flatpickr', 'sl_u
                     return a.text;
                 }
             }
-        })
-
-        try {
-          s2.overrideSelect2Keys();
-        }catch(e) {
-          // IE11 fail
-        }
+        }).overrideSelect2Keys();
 
         $.each($date_time, function(idx, dt){
             var init_date = null;
@@ -135,14 +129,7 @@ require(['jquery', 'lodash', 'moment', 'autosize', 'select2', 'flatpickr', 'sl_u
             templateSelection: generate_status_label,
             minimumResultsForSearch: 10,
             width: '100%'
-        });
-
-        try {
-          // https://github.com/qatrackplus/qatrackplus/issues/679
-          $service_status.overrideSelect2Keys();
-        } catch (e) {
-        }
-
+        }).overrideSelect2Keys();
 
         // Service Type and Review Required --------------------------------------------------------------
         $service_type.change(function() {

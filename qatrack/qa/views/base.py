@@ -208,6 +208,7 @@ class UTCList(BaseListableView):
     widgets = {
         "unit__name": SELECT_MULTI,
         "unit__site__name": SELECT_MULTI,
+        "unit__department__name": SELECT_MULTI,#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         "frequency__name": SELECT_MULTI,
         "assigned_to__name": SELECT_MULTI,
         "last_instance__work_completed": DATE_RANGE,
@@ -224,6 +225,7 @@ class UTCList(BaseListableView):
         "frequency",
         "unit",
         "unit__site",
+        #"unit__location",#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         "assigned_to",
     )
 
@@ -231,6 +233,7 @@ class UTCList(BaseListableView):
         "name": _l("Test List/Cycle"),
         "unit__name": _l("Unit"),
         "unit__site__name": _l("Site"),
+        "unit__department__name": _l("Department"),#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         "frequency__name": _l("Frequency"),
         "assigned_to__name": _l("Assigned To"),
         "last_instance__work_completed": _l("Completed"),
@@ -277,6 +280,7 @@ class UTCList(BaseListableView):
         multiple_sites = len(set(Unit.objects.values_list("site_id"))) > 1
         if multiple_sites:
             fields += ("unit__site__name",)
+            fields += ("unit__department__name",)#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         fields += (
             "unit__name",

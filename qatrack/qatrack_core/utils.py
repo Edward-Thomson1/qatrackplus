@@ -32,7 +32,7 @@ def chrometopdf(html, name=""):
             '--print-to-pdf=%s' % out_path,
             "file://%s" % tmp_html.name,
         ]
-
+        
         if os.name.lower() == "nt":
             command = ' '.join(command)
 
@@ -44,13 +44,18 @@ def chrometopdf(html, name=""):
         pdf = out_file.read()
         out_file.close()
 
+        print(out_path)
+        print(out_file)
+
     except OSError:
+        
         raise OSError("chrome '%s' executable not found" % (settings.CHROME_PATH))
+        
     finally:
         if not tmp_html.closed:
             tmp_html.close()
-        if not out_file.closed:
-            out_file.close()
+        # if not out_file.closed: #!!!!!!!!!!!!!!!!!!!!!!!!!!
+        #     out_file.close()
         try:
             os.unlink(tmp_html.name)
         except:  # noqa: E722

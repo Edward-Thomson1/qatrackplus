@@ -20,10 +20,10 @@ from .models import (
     UnitAvailableTime,
     UnitClass,
     UnitType,
-    Vendor,
+    Vendor,Department
 )
 
-#quick test of branch set up
+
 class UnitFormAdmin(ModelForm):
 
     type = ChoiceField(label=_l("Unit Type"))
@@ -54,14 +54,17 @@ class UnitFormAdmin(ModelForm):
             'name',
             'serial_number',
             'location',
+           # 'room',
             'install_date',
             'date_acceptance',
             'active',
             'type',
             'is_serviceable',
+            
             'site',
+            'department',
             'modalities',
-            'service_areas',
+            'service_areas'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -72,7 +75,31 @@ class UnitFormAdmin(ModelForm):
 
         if Site.objects.count() == 1 and not self.instance.pk:
             self.fields['site'].initial = Site.objects.first()
+#-------------------------------------------------------------------------------------------------------
+        def site_name(ds):
+             return ds.name# if ds else "Other"
 
+        def department_unit_site(ds):
+            return "%s %s" % (ds.name + ":" if ds.site else ds.name, ds.site.name if ds.site else "")
+        
+
+        site = self.fields['site'].initial
+        if site:
+            self.fields['departments'].queryset = Department.objects.filter(site=site)
+        
+        # self.dep_sites = Department.objects.filter(site__name=self.fields['site'].initial)#.order_by("site__name", "name")
+
+        # # dep_sites = Department.objects.select_related("site").order_by("site__name", "name")
+        # # choices = [(v, list(uts)) for (v, uts) in groupby(dep_sites, key=site_name)]
+        # # choices = [(v, [(ut.id, department_unit_site(ut)) for ut in uts]) for (v, uts) in choices]
+        # # choices = [("", "---------")] + choices
+        
+        # self.fields['department'].initial = self.dep_sites
+
+    #   self.divisions = Division.objects.filter(users=user)
+    #   super(MyForm, self).__init__(*args, **kwargs)
+    #   self.fields['division'].queryset = self.divisions
+#-----------------------------------------------------------------------------------------------------
         def vendor_name(ut):
             return ut.vendor.name if ut.vendor else "Other"
 
@@ -145,7 +172,7 @@ class UnitAvailableTimeInline(admin.TabularInline):
 class UnitAdmin(BaseQATrackAdmin):
 
     form = UnitFormAdmin
-    list_display = ['name', 'number', 'active', 'type', 'site', 'is_serviceable']
+    list_display = ['name', 'number', 'active', 'type', 'site','location', 'is_serviceable'] #!!!!!!!!!!!!!!!!!!!!!!
     list_filter = ['active', 'site', 'modalities', 'type__unit_class']
     list_editable = ['site', 'is_serviceable']
     list_select_related = ["site", "type"]
@@ -209,14 +236,42 @@ class ModalityAdmin(BaseQATrackAdmin):
 class SiteAdmin(BaseQATrackAdmin):
     """QC categories admin"""
     prepopulated_fields = {'slug': ('name',)}
-    list_display = (
-        "name",
-        "slug"
-    )
+    # list_display = (
+    #     "name",
+    #     "slug"
+    # )
+
+    list_display = ['name']
+    
+
+class depAdmin(BaseQATrackAdmin):
+    """QC categories admin"""
+    prepopulated_fields = {'slug': ('name',)}
+    # list_display = (
+    #     "name",
+    #     "slug"
+    # )
+    #list_display_links = ['name']
+    list_display = ['name', 'site']
+    list_filter = ['name']
+    list_editable = ['site']
+    
+
+    def get_queryset(self, request):
+        return super(depAdmin, self).get_queryset(request).select_related(
+            "site",
+           
+        )
+   
+    
+
+   
 
 
 admin.site.register(Unit, UnitAdmin)
 admin.site.register(UnitType, UnitTypeAdmin)
 admin.site.register(Modality, ModalityAdmin)
-admin.site.register(Site, SiteAdmin)
+admin.site.register([Site], SiteAdmin)
 admin.site.register([UnitClass, Vendor], BaseQATrackAdmin)
+admin.site.register([Department], depAdmin)
+
