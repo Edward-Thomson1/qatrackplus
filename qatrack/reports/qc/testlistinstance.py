@@ -191,7 +191,7 @@ class TestListInstanceDetailsReport(BaseReport):
 
     category = _l("QC")
 
-    template = "reports/qc/testlistinstance_details.html"
+    template = "reports/qc/testlistinstance_details_edited.html"  #!!!!!!!!!!!!!!!!!!!!!!!!!!! change back to standard
 
     __test__ = False  # supress pytest warning
 
@@ -352,22 +352,23 @@ class TestListInstanceDetailsReport(BaseReport):
             rows.append(headers)
 
             for ti, history in tli.history()[0]:
-                row = [
-                    ti.unit_test_info.test.name,
-                    ti.value_display(coerce_numerical=False),
-                    ti.reference.value_display() if ti.reference else "",
-                    ti.tolerance.name if ti.tolerance else "",
-                ]
-                if settings.REVIEW_DIFF_COL and not ti.string_value:
-                    row.append(ti.diff_display())
-                row.extend([
-                    ti.get_pass_fail_display(),
-                    ti.status.name,
-                    ti.comment,
-                ])
-                for a in ti.attachment_set.all():
-                    row.append(self.make_url(a.attachment.url, plain=True))
+                if not ti.unit_test_info.test.hidden:
+                    row = [
+                        ti.unit_test_info.test.name,
+                        ti.value_display(coerce_numerical=False),
+                        ti.reference.value_display() if ti.reference else "",
+                        ti.tolerance.name if ti.tolerance else "",
+                    ]
+                    if settings.REVIEW_DIFF_COL and not ti.string_value:
+                        row.append(ti.diff_display())
+                    row.extend([
+                        ti.get_pass_fail_display(),
+                        ti.status.name,
+                        ti.comment,
+                    ])
+                    for a in ti.attachment_set.all():
+                        row.append(self.make_url(a.attachment.url, plain=True))
 
-                rows.append(row)
+                    rows.append(row)
 
         return rows
