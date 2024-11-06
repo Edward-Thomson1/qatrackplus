@@ -1,6 +1,7 @@
 import os
 import subprocess
 import uuid
+import shutil #!!!!!!!!!!!!!!!
 
 from dateutil import relativedelta as rdelta
 from django.conf import settings
@@ -20,19 +21,44 @@ def chrometopdf(html, name=""):
         path = os.path.join(settings.TMP_REPORT_ROOT, fname)
         out_path = "%s.pdf" % path
 
+    except OSError:
+        
+        raise OSError("error 1 chrome '%s' executable not found" % (settings.CHROME_PATH))
+    try:
+
         tmp_html = open(path, "wb")
         tmp_html.write(html.encode("UTF-8"))
         tmp_html.close()
 
-        command = [
-            settings.CHROME_PATH,
+        shutil.copy(path,os.path.join('H:\\python_tests',fname))
+
+    except OSError:
+        
+        raise OSError("error 2 chrome '%s' executable not found" % (settings.CHROME_PATH))
+
+    if os.path.exists(path):
+        print(path)
+        pass
+    else:
+        raise OSError("error 3 html file '%s' not found" % (path))
+
+    
+    try:
+
+        command = [                               
+            r'C:\Progra~2\Microsoft\Edge\Application\msedge.exe',
             '--headless',
             '--disable-gpu',
             '--no-sandbox',
-            '--print-to-pdf=%s' % out_path,
-            "file://%s" % tmp_html.name,
+            "--virtual-time-budget=10", 
+            "--run-all-compositor-stages-before-draw", 
+            r'--print-to-pdf=%s' % out_path, 
+            r'file://%s' % tmp_html.name,
         ]
+    except OSError:
         
+        raise OSError("chrome error 3'%s' executable not found" % (settings.CHROME_PATH))
+    try:        
         if os.name.lower() == "nt":
             command = ' '.join(command)
 
@@ -40,22 +66,24 @@ def chrometopdf(html, name=""):
         stderr = open(os.path.join(settings.LOG_ROOT, 'report-stderr.txt'), 'a')
         subprocess.call(command, stdout=stdout, stderr=stderr)
 
+        print(out_path)
+    except OSError:
+        
+        raise OSError("chrome error 4'%s' executable not found" % (settings.CHROME_PATH))
+    try:
         out_file = open(out_path, 'r+b')
         pdf = out_file.read()
         out_file.close()
 
-        print(out_path)
-        print(out_file)
 
     except OSError:
         
-        raise OSError("chrome '%s' executable not found" % (settings.CHROME_PATH))
+        raise OSError("chrome '%s' executable not found" % (settings.CHROME_PATH)) # chnaged to outpath
         
     finally:
         if not tmp_html.closed:
             tmp_html.close()
-        # if not out_file.closed: #!!!!!!!!!!!!!!!!!!!!!!!!!!
-        #     out_file.close()
+
         try:
             os.unlink(tmp_html.name)
         except:  # noqa: E722
