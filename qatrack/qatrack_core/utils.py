@@ -30,23 +30,19 @@ def chrometopdf(html, name=""):
         tmp_html.write(html.encode("UTF-8"))
         tmp_html.close()
 
-        shutil.copy(path,os.path.join('H:\\python_tests',fname))
+        #shutil.copy(path,os.path.join('H:\\python_tests',fname)) part of debugging
 
     except OSError:
         
         raise OSError("error 2 chrome '%s' executable not found" % (settings.CHROME_PATH))
 
-    if os.path.exists(path):
-        print(path)
-        pass
-    else:
-        raise OSError("error 3 html file '%s' not found" % (path))
+
 
     
     try:
 
         command = [                               
-            r'C:\Progra~2\Microsoft\Edge\Application\msedge.exe',
+            r'C:\Progra~2\Microsoft\Edge\Application\msedge.exe', # hard coded for windows rather than chrome path
             '--headless',
             '--disable-gpu',
             '--no-sandbox',
@@ -66,7 +62,7 @@ def chrometopdf(html, name=""):
         stderr = open(os.path.join(settings.LOG_ROOT, 'report-stderr.txt'), 'a')
         subprocess.call(command, stdout=stdout, stderr=stderr)
 
-        print(out_path)
+        
     except OSError:
         
         raise OSError("chrome error 4'%s' executable not found" % (settings.CHROME_PATH))
@@ -78,7 +74,7 @@ def chrometopdf(html, name=""):
 
     except OSError:
         
-        raise OSError("chrome '%s' executable not found" % (settings.CHROME_PATH)) # chnaged to outpath
+        raise OSError("chrome '%s' executable not found this error is depreciated, path has been changed to C:\Progra~2\Microsoft\Edge\Application\msedge.exe " % (settings.CHROME_PATH) ) # chnaged to outpath
         
     finally:
         if not tmp_html.closed:
