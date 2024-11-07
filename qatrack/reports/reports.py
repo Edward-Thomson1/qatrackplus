@@ -257,7 +257,7 @@ class BaseReport(object, metaclass=ReportMeta):
     def to_pdf(self):
         fname = self.get_filename("pdf")
         context = self.get_context()
-        context['base_template'] = "reports/pdf_report.html"
+        context['base_template'] = "reports/pdf_report_edited.html" #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         template = self.get_template(using=None)
         content = template.render(context)
         return chrometopdf(content, name=fname)
