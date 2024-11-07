@@ -20,11 +20,7 @@ def chrometopdf(html, name=""):
         fname = "%s_%s.html" % (name, uuid.uuid4().hex[:10])
         path = os.path.join(settings.TMP_REPORT_ROOT, fname)
         out_path = "%s.pdf" % path
-
-    except OSError:
-        
-        raise OSError("error 1 chrome '%s' executable not found" % (settings.CHROME_PATH))
-    try:
+   
 
         tmp_html = open(path, "wb")
         tmp_html.write(html.encode("UTF-8"))
@@ -32,41 +28,42 @@ def chrometopdf(html, name=""):
 
         #shutil.copy(path,os.path.join('H:\\python_tests',fname)) part of debugging
 
-    except OSError:
-        
-        raise OSError("error 2 chrome '%s' executable not found" % (settings.CHROME_PATH))
-
-
-
     
-    try:
 
-        command = [                               
-            r'C:\Progra~2\Microsoft\Edge\Application\msedge.exe', # hard coded for windows rather than chrome path
-            '--headless',
-            '--disable-gpu',
-            '--no-sandbox',
-            "--virtual-time-budget=10", 
-            "--run-all-compositor-stages-before-draw", 
-            r'--print-to-pdf=%s' % out_path, 
-            r'file://%s' % tmp_html.name,
-        ]
-    except OSError:
+
+        # command = [                               
+        #     r'C:\Progra~2\Microsoft\Edge\Application\msedge.exe', # hard coded for windows rather than chrome path
+        #     #r'C:\"Program Files"\Google\Chrome\Application\chrome.exe',
+        #     '--headless',
+        #     '--disable-gpu',
+        #     '--no-sandbox',
+        #     r'--print-to-pdf=%s' % out_path, 
+        #     "--virtual-time-budget=10", 
+        #     "--run-all-compositor-stages-before-draw", 
+        #     r'file://%s' % tmp_html.name,
+        # ]
+
+        command = [
+                    r'C:\Program Files\Google\Chrome\Application\chrome.exe',
+                    '--headless=old',
+                    '--disable-gpu', 
+                    '--no-sandbox', 
+                    r'--print-to-pdf=%s' % out_path, 
+                    '--virtual-time-budget=10', 
+                    '--run-all-compositor-stages-before-draw', 
+                    r'file://%s' % tmp_html.name,
+                ]
         
-        raise OSError("chrome error 3'%s' executable not found" % (settings.CHROME_PATH))
-    try:        
-        if os.name.lower() == "nt":
-            command = ' '.join(command)
+       
+        # if os.name.lower() == "nt":
+        #     command = ' '.join(command)
 
         stdout = open(os.path.join(settings.LOG_ROOT, 'report-stdout.txt'), 'a')
         stderr = open(os.path.join(settings.LOG_ROOT, 'report-stderr.txt'), 'a')
         subprocess.call(command, stdout=stdout, stderr=stderr)
 
-        
-    except OSError:
-        
-        raise OSError("chrome error 4'%s' executable not found" % (settings.CHROME_PATH))
-    try:
+
+    
         out_file = open(out_path, 'r+b')
         pdf = out_file.read()
         out_file.close()
@@ -74,7 +71,7 @@ def chrometopdf(html, name=""):
 
     except OSError:
         
-        raise OSError("chrome '%s' executable not found this error is depreciated, path has been changed to C:\Progra~2\Microsoft\Edge\Application\msedge.exe " % (settings.CHROME_PATH) ) # chnaged to outpath
+        raise OSError("chrome '%s' executable not found" % (settings.CHROME_PATH) ) 
         
     finally:
         if not tmp_html.closed:
