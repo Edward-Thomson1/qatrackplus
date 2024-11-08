@@ -12,7 +12,7 @@ from qatrack.service_log.models import (
     UnitServiceArea,
 )
 
-from .forms import UnitAvailableTimeForm
+from .forms import UnitAvailableTimeForm#,UnitPartForm
 from .models import (
     Modality,
     Site,
@@ -20,7 +20,7 @@ from .models import (
     UnitAvailableTime,
     UnitClass,
     UnitType,
-    Vendor,Department
+    Vendor,Department,UnitPart
 )
 
 
@@ -54,17 +54,18 @@ class UnitFormAdmin(ModelForm):
             'name',
             'serial_number',
             'location',
-           # 'room',
+            'room',
             'install_date',
             'date_acceptance',
             'active',
             'type',
-            'is_serviceable',
-            
+            'is_serviceable',           
             'site',
             'department',
             'modalities',
             'service_areas'
+            
+            
         ]
 
     def __init__(self, *args, **kwargs):
@@ -87,19 +88,6 @@ class UnitFormAdmin(ModelForm):
         if site:
             self.fields['departments'].queryset = Department.objects.filter(site=site)
         
-        # self.dep_sites = Department.objects.filter(site__name=self.fields['site'].initial)#.order_by("site__name", "name")
-
-        # # dep_sites = Department.objects.select_related("site").order_by("site__name", "name")
-        # # choices = [(v, list(uts)) for (v, uts) in groupby(dep_sites, key=site_name)]
-        # # choices = [(v, [(ut.id, department_unit_site(ut)) for ut in uts]) for (v, uts) in choices]
-        # # choices = [("", "---------")] + choices
-        
-        # self.fields['department'].initial = self.dep_sites
-
-    #   self.divisions = Division.objects.filter(users=user)
-    #   super(MyForm, self).__init__(*args, **kwargs)
-    #   self.fields['division'].queryset = self.divisions
-#-----------------------------------------------------------------------------------------------------
         def vendor_name(ut):
             return ut.vendor.name if ut.vendor else "Other"
 
@@ -112,6 +100,8 @@ class UnitFormAdmin(ModelForm):
         choices = [("", "---------")] + choices
 
         self.fields['type'].choices = choices
+
+        #self.fields['Units_parts'] = [UnitPartInline]
 
     def clean_type(self):
         utype = self.cleaned_data.get('type')
@@ -142,7 +132,8 @@ class UnitFormAdmin(ModelForm):
                     )
 
         return service_areas
-
+    #---------------------------------------------------------------------------------------------------------------------
+        
     def save(self, commit=True):
 
         unit = super().save(commit=commit)
@@ -158,7 +149,17 @@ class UnitFormAdmin(ModelForm):
                 usa.delete()
 
         return unit
+    
 
+#----------------------------------------------------------------------------------------
+class UnitPartInline(admin.TabularInline):
+
+    model = UnitPart
+    extra = 1
+    fields = ['name', 'vendor', 'model', 'Serial_number']
+    verbose_name_plural = 'Unit Parts'
+
+#----------------------------------------------------------------------------------------
 
 class UnitAvailableTimeInline(admin.TabularInline):
 
@@ -181,7 +182,9 @@ class UnitAdmin(BaseQATrackAdmin):
 
     save_as = True
 
-    inlines = [UnitAvailableTimeInline]
+    inlines = [UnitAvailableTimeInline,UnitPartInline]
+
+    
 
     class Media:
         js = (
@@ -262,13 +265,9 @@ class depAdmin(BaseQATrackAdmin):
             "site",
            
         )
-   
-    
-
-   
-
 
 admin.site.register(Unit, UnitAdmin)
+#admin.site.register(UnitPart)
 admin.site.register(UnitType, UnitTypeAdmin)
 admin.site.register(Modality, ModalityAdmin)
 admin.site.register([Site], SiteAdmin)

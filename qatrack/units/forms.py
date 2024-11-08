@@ -13,6 +13,21 @@ from qatrack.service_log.forms import HoursMinDurationField
 from qatrack.units import models as u_models
 
 
+# class PartForm(forms.ModelForm):
+#     class Meta:
+#         model = u_models.Part
+#         fields = ['part_type', 'manufacturer', 'model_name', 'serial_number']
+
+
+# class UnitPartForm(forms.ModelForm):
+
+#     class Meta:
+#         model = u_models.UnitPart
+#         fields = 'part_type'#['part_type', 'vendor', 'model', 'Serial_number']
+
+#     def __init__(self, *args, **kwargs):
+#         super(UnitPartForm, self).__init__(*args, **kwargs)
+
 def max_24hr(value):
     if value > timedelta(hours=24):
 

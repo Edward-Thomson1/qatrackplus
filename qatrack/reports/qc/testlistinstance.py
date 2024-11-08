@@ -351,7 +351,14 @@ class TestListInstanceDetailsReport(BaseReport):
             ])
             rows.append(headers)
 
+            # past_values = []
+            # for ti, history in tli.history()[1]:
+            #     past_values.append(ti)
+
             for ti, history in tli.history()[0]:
+            # for i in enumerate(tli.history()[0]):
+            #     ti = tli.history()[0][0]
+            #     history = tli.history()[0][1]
                 if not ti.unit_test_info.test.hidden:
                     row = [
                         ti.unit_test_info.test.name,

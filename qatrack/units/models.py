@@ -97,14 +97,6 @@ class Site(models.Model):
     Allows for multiple site filtering (different campuses, buildings, hospitals, etc)
     """
 
-    # department = models.ForeignKey(
-    #     Department,
-    #     null=True,
-    #     blank=True,
-    #     on_delete=models.PROTECT,
-    #     verbose_name=_l("department"),
-    # )
-
     name = models.CharField(
         verbose_name=_l("name"),
         max_length=64,
@@ -118,30 +110,9 @@ class Site(models.Model):
         unique=True,
     )
 
-   
-    # objects = UnitsiteManager()
-
-    # class Meta:
-    #     unique_together=[('name','department')]
-    #     ordering = ("name",'department')
-    #     verbose_name = _l("site")
-    #     verbose_name_plural = _l("sites")
 
     def __str__(self):
         return self.name
-    
-
-   
-    # def natural_key(self):
-    #     department = self.department.natural_key() if self.department else ()
-        
-    #     return (self.name) + department 
-    
-    # natural_key.dependencies = ["units.department"]
-
-    # def __str__(self):
-    #     """Display more descriptive name"""
-    #     return '%s%s' % (self.name, ' - %s' % self.department if self.department else '')
 
 class Department(models.Model): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     """ department of Unit
@@ -207,7 +178,7 @@ class UnitTypeManager(models.Manager):
 
     def get_by_natural_key(self, name, model, vendor_name=None, unitclass_name=None):
         return self.get(name=name, model=model, vendor__name=vendor_name, unit_class__name=unitclass_name)
-
+   
 
 class UnitType(models.Model):
     """Radiation Device Type
@@ -306,7 +277,11 @@ def weekday_count(start_date, end_date, uate_list):
             day_name = calendar.day_name[day.weekday()].lower()
             week[day_name] = week[day_name] + 1 if day_name in week else 1
     return week
+#------------------------------------------------------------------------------------------------------------------------
 
+    
+
+#--------------------------------------------------------------------------------------------------------------------
 
 class Unit(models.Model):
     """Radiation devices
@@ -315,6 +290,10 @@ class Unit(models.Model):
     type = models.ForeignKey(UnitType, verbose_name=_l("Unit Type"), on_delete=models.PROTECT)
     site = models.ForeignKey(Site, null=True, blank=True, on_delete=models.PROTECT)
     department = models.ForeignKey(Department, null=True, blank=True, on_delete=models.PROTECT)
+
+    #Units_parts = models.ForeignKey(UnitPart, null=True, blank=True, on_delete=models.PROTECT)
+    
+    
 
     number = models.PositiveIntegerField(
         null=False,
@@ -325,7 +304,7 @@ class Unit(models.Model):
     name = models.CharField(max_length=256, help_text=_l('The display name for this unit'))
     serial_number = models.CharField(max_length=256, null=True, blank=True, help_text=_l('Optional serial number'))
     location = models.CharField(max_length=256, null=True, blank=True, help_text=_l('Optional location information'))
-    #room = models.CharField(max_length=256, null=True, blank=True, help_text=_l('Optional Room information')) #!!!!!!!!!!!!!!!!!!!!!!!
+    room = models.CharField(max_length=256, null=True, blank=True, help_text=_l('Optional Room information')) #!!!!!!!!!!!!!!!!!!!!!!!
     install_date = models.DateField(null=True, blank=True, help_text=_l('Optional install date'))
     date_acceptance = models.DateField(
         verbose_name=_l("Acceptance date"),
@@ -339,6 +318,8 @@ class Unit(models.Model):
 
     modalities = models.ManyToManyField(Modality)
 
+    
+
     class Meta:
         ordering = [settings.ORDER_UNITS_BY]
         verbose_name = _l("unit")
@@ -348,7 +329,7 @@ class Unit(models.Model):
         return self.name
 
     def site_unit_name(self):
-        return "%s :: %s" % (_("Other") if not self.site else self.site.name, self.name)
+        return "%s : %s" % (_("Other") if not self.site else self.site.name, self.name)
     
     # def location_unit_name(self): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     #     return "%s :: %s" % (_("Other") if not self.location else self.location.name, self.name)
@@ -408,7 +389,70 @@ class Unit(models.Model):
     def get_available_times_list(self):
         return [uat.to_dict() for uat in self.unitavailabletime_set.all()]
 
+#------------------------------------------------------------------------------------------------------------   
 
+class UnitPartManager(models.Manager):
+
+    def get_by_natural_key(self, name, model, vendor_name=None):
+        return self.get(name=name, model=model, vendor__name=vendor_name)
+
+class UnitPart(models.Model):
+    """part of a radiation device
+    
+    """
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='parts',default=1)
+
+    name = models.CharField(
+    verbose_name=_l("part type"),
+        max_length=50,
+        null=True,
+        blank=True,
+        help_text=_l('Part type e.g. tube'),
+    )
+
+    vendor = models.ForeignKey(
+    Vendor,
+    null=True,
+    blank=True,
+    on_delete=models.PROTECT,
+    verbose_name=_l("vendor"),
+    )
+
+    model = models.CharField(
+        verbose_name=_l("model name"),
+        max_length=50,
+        null=True,
+        blank=True,
+        help_text=_l('Optional model name for this group'),
+    )
+
+    Serial_number = models.CharField(
+        verbose_name=_l("Serial Number"),
+        max_length=50,
+        null=True,
+        blank=True,
+        help_text=_l('part serial number'),
+    )
+
+    objects = UnitPartManager()
+
+    class Meta:
+        unique_together = [('name', 'vendor', 'model', 'Serial_number',)]
+        ordering = ( "name",)
+        verbose_name = _l("unit part")
+        verbose_name_plural = _l("unit parts")
+
+    def natural_key(self):
+        vendor = self.vendor.natural_key() if self.vendor else ()
+        return (self.name, self.model) + vendor 
+
+    def __str__(self):
+        """Display more descriptive name"""
+        return '%s%s' % (self.name, ' - %s' % self.model if self.model else '')
+    # def __str__(self):
+    #     return self.name
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------
 class UnitAvailableTimeEdit(models.Model):
     """
     A one off change to unit available time (holiday's, extended hours for a single day, etc)
@@ -508,3 +552,6 @@ def get_unit_info(unit_ids=None, active_only=True, serviceable_only=False):
             unit_info[unit]['modalities'].add(modality)
 
     return unit_info
+
+
+
