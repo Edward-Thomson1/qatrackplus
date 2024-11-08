@@ -129,6 +129,7 @@
               <tr>
                 <th style="">{% trans "Test" %}<div></div></th>
                 <th style="width: 10%"  class="review-value">{% trans "Value" %}</th>   <!-- changed to see if stuff appears-->
+                <th style="width: 10%"  class="review-pastvalue">{% trans "Previous Value" %}</th>
                 <th style="width: 8%" class="review-ref">{% trans "Reference" %}</th>
                 <th style="width: 25%">{% trans "Tolerance" %}</th>
                 {% if review_diff_col %}
@@ -141,6 +142,7 @@
             <tbody>
               {% for ti in tli.testinstance_set.all %}
               {% if not ti.unit_test_info.test.hidden %} <!-- trying to remove hidden values, this works !!!-->
+              {% if ti.reference or ti.tolerance %}
 
                 {% with test=ti.unit_test_info.test %}
                   {% with borders.starts|lookup:forloop.counter0 as delim %}
@@ -160,7 +162,13 @@
                     {% endif %}
                   {% endwith %}
                   <tr>
-                    <td>{{test}}</td>
+                    <td>
+                      {% if test.display_name %}
+                        {{test.display_name}} 
+                      {% else %}
+                        {{test.name}}
+                      {% endif %}
+                    </td>
                     <td class="review-value">
                       <span
                         class="label pass-fail {{ ti.pass_fail }}"
@@ -180,6 +188,26 @@
                         {{ ti.value_display | safe}}
                       </span>
                     </td>
+                    <td class="review-value">
+                      <span
+                        class="label pass-fail {{ ti.unit_test_info.get_last_val.pass_fail }}"
+                        title="{% if ti.string_value %}{{ti.value_display}}{% else %}{{ti.diff_display}}{% endif %}"
+                      >
+                        {% with ti.unit_test_info.get_last_val.pass_fail as status %}
+                          {% if status == 'tolerance' %}
+                              <i class="pull-left fa fa-exclamation-circle" aria-hidden="true"></i>
+                          {% elif status == 'action' %}
+                              <i class="pull-left fa fa-ban" aria-hidden="true"></i>
+                          {% elif status == 'ok' %}
+                              <i class="pull-left fa fa-check-circle-o" aria-hidden="true"></i>
+                          {% elif status == 'not_done' %}
+                              <i class="pull-left fa fa-circle-o" aria-hidden="true"></i>
+                          {% endif %}
+                        {% endwith %}
+                        {{ ti.unit_test_info.get_last_val.value_display | safe}}
+                      </span>
+                    </td>
+                    <!--<td>{{ti.unit_test_info.get_last_val.value}}</td>-->
                     <td class="review-ref">
                       {% if ti.reference %}
                         {{ ti.reference.value_display }}
@@ -231,6 +259,7 @@
                   {% endwith %}
                 {% endif %}
               {% endif %}      <!--new end if to make sure it does not appear-->
+              {% endif %}
               {% endfor %}
 
               {% if tli.attachment_set.exists %}

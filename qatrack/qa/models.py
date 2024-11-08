@@ -1354,6 +1354,12 @@ class UnitTestInfo(models.Model):
         hist = self.testinstance_set.select_related("status").all().order_by("-work_completed", "-pk")
         # hist = hist.select_related("status")
         return [(x.work_completed, x.value, x.pass_fail, x.status) for x in reversed(hist[:number])]
+    
+    def get_last_val(self):
+        hist = self.testinstance_set.select_related("status").all().order_by("-work_completed", "-pk")
+        # hist = hist.select_related("status")
+        return hist[0]
+
 
     def __str__(self):
         return "UnitTestInfo(%s)" % self.pk

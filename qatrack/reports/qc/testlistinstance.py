@@ -337,7 +337,7 @@ class TestListInstanceDetailsReport(BaseReport):
             rows.append([])
             headers = [
                 _("Test"),
-                _("Value"),
+                _("Value"),_("Past Value"),
                 _("Reference"),
                 _("Tolerance"),
             ]
@@ -356,13 +356,11 @@ class TestListInstanceDetailsReport(BaseReport):
             #     past_values.append(ti)
 
             for ti, history in tli.history()[0]:
-            # for i in enumerate(tli.history()[0]):
-            #     ti = tli.history()[0][0]
-            #     history = tli.history()[0][1]
                 if not ti.unit_test_info.test.hidden:
                     row = [
-                        ti.unit_test_info.test.name,
+                        ti.unit_test_info.test.display_name,
                         ti.value_display(coerce_numerical=False),
+                        past_ti.value_display(coerce_numerical=False),
                         ti.reference.value_display() if ti.reference else "",
                         ti.tolerance.name if ti.tolerance else "",
                     ]
