@@ -7,6 +7,160 @@
 
 {% block content %}
 
+
+
+
+<div {% if not forloop.first %}style="page-break-before: always; padding-top:20px;" {% endif %}>
+
+  <div class="row" >
+    <div class="col-xs-12">
+      <strong>{% trans "Report Summary" %} :</strong>
+    </div>
+  </div>
+  {% for tli in queryset %}
+  <div class="row" >
+    <div class="col-xs-12">
+      {{tli.test_list.name}}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      {% with borders=tli.sublist_borders %}
+        <table id="review-table" class="table table-bordered table-striped table-condensed" >
+          <thead>
+            <tr>
+              <th style="">{% trans "Test" %}<div></div></th>
+              <th style="width: 10%"  class="review-value">{% trans "Value" %}</th>   <!-- changed to see if stuff appears-->
+              <th style="width: 10%"  class="review-pastvalue">{% trans "Previous Value" %}</th>
+              <th style="width: 8%" class="review-ref">{% trans "Reference" %}</th>
+              <th style="width: 25%">{% trans "Tolerance" %}</th>
+              {% if review_diff_col %}
+                <th style="width: 10%" class="review-status">{% trans "Difference" %}</th>
+              {% endif %}
+              <th style="width: 10%" class="review-status">{% trans "Pass/Fail" %}</th>
+              <th style="width: 10%" class="review-status">{% trans "Status" %}</th>
+            </tr>
+          </thead>
+        <!-- <div class="row" >
+          <div class="col-xs-12">
+            {{tli.test_list.name}}
+          </div> -->
+          <tbody>
+            {% for ti in tli.testinstance_set.all %}
+            {% if ti.unit_test_info.test.summary %} <!-- replaces this {% if ti.reference or ti.tolerance %}-->
+           
+
+              {% with test=ti.unit_test_info.test %}
+                {% with borders.starts|lookup:forloop.counter0 as delim %}
+                  {% if delim and delim.class == "sublist" %}
+                    <tr class="{{delim.class }}">
+                      <td colspan="2">
+                        {% if delim.description %}
+                          <a class="show-sublist-details" href="#">
+                            {{ delim.name }}
+                          </a>
+                        {% else %}
+                            {{ delim.name }}
+                        {% endif %}
+                      </td>
+                      <td colspan="{% qa_table_colspan perms offset=2 %}">&nbsp;</td>
+                    </tr>
+                  {% endif %}
+                {% endwith %}
+                <tr>
+                  <td>
+                    {% if test.display_name %}
+                      {{test.display_name}} 
+                    {% else %}
+                      {{test.name}}
+                    {% endif %}
+                  </td>
+                  <td class="review-value">
+                    <span
+                      class="label pass-fail {{ ti.pass_fail }}"
+                      title="{% if ti.string_value %}{{ti.value_display}}{% else %}{{ti.diff_display}}{% endif %}"
+                    >
+                      {% with ti.pass_fail as status %}
+                        {% if status == 'tolerance' %}
+                            <i class="pull-left fa fa-exclamation-circle" aria-hidden="true"></i>
+                        {% elif status == 'action' %}
+                            <i class="pull-left fa fa-ban" aria-hidden="true"></i>
+                        {% elif status == 'ok' %}
+                            <i class="pull-left fa fa-check-circle-o" aria-hidden="true"></i>
+                        {% elif status == 'not_done' %}
+                            <i class="pull-left fa fa-circle-o" aria-hidden="true"></i>
+                        {% endif %}
+                      {% endwith %}
+                      {{ ti.value_display | safe}}
+                    </span>
+                  </td>
+                  <td class="review-pastvalue">
+                    <span
+                      class="label pass-fail {{ ti.unit_test_info.get_last_val.pass_fail }}"
+                      title="{% if ti.string_value %}{{ti.value_display}}{% else %}{{ti.diff_display}}{% endif %}"
+                    >
+                      {% with ti.unit_test_info.get_last_val.pass_fail as status %}
+                        {% if status == 'tolerance' %}
+                            <i class="pull-left fa fa-exclamation-circle" aria-hidden="true"></i>
+                        {% elif status == 'action' %}
+                            <i class="pull-left fa fa-ban" aria-hidden="true"></i>
+                        {% elif status == 'ok' %}
+                            <i class="pull-left fa fa-check-circle-o" aria-hidden="true"></i>
+                        {% elif status == 'not_done' %}
+                            <i class="pull-left fa fa-circle-o" aria-hidden="true"></i>
+                        {% endif %}
+                      {% endwith %}
+                      {{ ti.unit_test_info.get_last_val.value_display | safe}}
+                    </span>
+                  </td>
+                  <!--<td>{{ti.unit_test_info.get_last_val.value}}</td>-->
+                  <td class="review-ref">
+                    {% if ti.reference %}
+                      {{ ti.reference.value_display }}
+                    {% endif %}
+                  </td>
+                  <td style="font-size: 0.8em; padding-top: 8px;">
+                    {% if ti.tolerance %}
+                        {{ ti.tolerance.name }}
+                    {% endif %}
+                  </td>
+                  {% if review_diff_col %}
+                    <td class="review-diff">
+                      {% if not ti.string_value %}{{ti.diff_display}}{% endif %}
+                    </td>
+                  {% endif %}
+                  <td class="review-status">
+                    {{ti.get_pass_fail_display}}
+                  </td>
+                  <td class="review-status">
+                    {{ti.status.name}}
+                  </td>
+                </tr>
+              {%endwith%}
+
+              {% if not forloop.last and borders.ends|lookup:forloop.counter0 %}
+                {% with borders.starts|lookup:forloop.counter as delim %}
+                  {% if not delim or delim.class != "sublist" %}
+                  <tr class="end-sublist">
+                      <td colspan="{% qa_table_colspan perms %}"></td>
+                  </tr>
+                  {% endif %}
+                {% endwith %}
+              {% endif %}
+            {% endif %}      <!--new end if to make sure it does not appear-->
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>       
+      {% endwith %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+
+
 {% for tli in queryset %}
 
   {% if not forloop.first and report_format != "pdf" %}
@@ -15,7 +169,20 @@
 
   <div {% if not forloop.first %}style="page-break-before: always; padding-top:20px;" {% endif %}>
 
-    <div class="row" >
+  <div class="row" >
+    <div class="col-xs-12">
+      <strong>{{tli.test_list.name}}</strong>
+    </div>
+  </div>
+</div>
+  {% for ti in tli.testinstance_set.all %}
+    {% if ti.unit_test_info.test.body %}
+      {{ti.string_value | safe}}
+
+    {% endif %}
+  {% endfor %}
+</div>
+    <!-- <div class="row" >
       <div class="col-xs-12">
         <strong>{% trans "Test List Instance Details" %} ::</strong>
       </div>
@@ -106,7 +273,7 @@
             </dd>
 
             <dt>{% trans "RtS for Events" %}:</dt>   <!-- change here to add the colours-->
-            <dd>
+            <!-- <dd>
               {% for se in tli.rtsqa_for_tli.all %}
               <a href="{% url 'sl_details' pk=se.id %}"
                   style="color: {{ se.service_status.colour }}"
@@ -119,7 +286,7 @@
           </dl>
         </div>
       </div>
-    {% endif %}
+    {% endif %} --> 
 
     <div class="row">
       <div class="col-xs-12">
@@ -142,7 +309,7 @@
             <tbody>
               {% for ti in tli.testinstance_set.all %}
               {% if not ti.unit_test_info.test.hidden %} <!-- trying to remove hidden values, this works !!!-->
-              {% if ti.reference or ti.tolerance %}
+              <!-- {% if ti.reference or ti.tolerance %} -->
 
                 {% with test=ti.unit_test_info.test %}
                   {% with borders.starts|lookup:forloop.counter0 as delim %}
@@ -188,7 +355,7 @@
                         {{ ti.value_display | safe}}
                       </span>
                     </td>
-                    <td class="review-value">
+                    <td class="review-pastvalue">
                       <span
                         class="label pass-fail {{ ti.unit_test_info.get_last_val.pass_fail }}"
                         title="{% if ti.string_value %}{{ti.value_display}}{% else %}{{ti.diff_display}}{% endif %}"
@@ -258,7 +425,7 @@
                     {% endif %}
                   {% endwith %}
                 {% endif %}
-              {% endif %}      <!--new end if to make sure it does not appear-->
+              <!-- {% endif %}      new end if to make sure it does not appear -->
               {% endif %}
               {% endfor %}
 

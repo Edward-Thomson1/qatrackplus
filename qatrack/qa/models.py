@@ -909,6 +909,19 @@ class Test(models.Model, TestPackMixin):
         help_text=_l("Don't display this test when performing QC"),
         default=False,
     )
+#---------------------------------------------------------------------------------------------
+    summary = models.BooleanField(
+        _l("Test result in Report Summary"),
+        help_text=_l("Display this text in the summary of reports"),
+        default=False,
+    )
+
+    body = models.BooleanField(
+        _l("Test result in Report"),
+        help_text=_l("Display this text in the body of reports"),
+        default=False,
+    )
+#------------------------------------------------------------------------------------------------
     skip_without_comment = models.BooleanField(
         _l("Skip without comment"),
         help_text=_l("Allow users to skip this test without a comment"),

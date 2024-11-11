@@ -1018,6 +1018,8 @@ class TestAdmin(SaveUserMixin, SaveInlineAttachmentUserMixin, BaseQATrackAdmin):
                     'hidden',
                     'chart_visibility',
                     'skip_without_comment',
+                    'summary',#-------------------------------------------------- added fields to tests
+                    'body',
                     'require_comment',
                     'formatting',
                 ],
