@@ -5,6 +5,7 @@
 {% load attach_tags %}
 {% load comments %}
 
+
 {% block content %}
 
 
@@ -42,14 +43,10 @@
               <th style="width: 10%" class="review-status">{% trans "Status" %}</th>
             </tr>
           </thead>
-        <!-- <div class="row" >
-          <div class="col-xs-12">
-            {{tli.test_list.name}}
-          </div> -->
+       
           <tbody>
             {% for ti in tli.testinstance_set.all %}
-              {% if ti.unit_test_info.test.summary %} <!-- replaces this {% if ti.reference or ti.tolerance %}-->
-                <!-- {% if not ti.reference or not ti.tolerance %} -->
+              {% if ti.unit_test_info.test.summary %} 
 
                   {% with test=ti.unit_test_info.test %}
                     {% with borders.starts|lookup:forloop.counter0 as delim %}
@@ -114,7 +111,7 @@
                           {{ ti.unit_test_info.get_last_val.value_display | safe}}
                         </span>
                       </td>
-                      <!--<td>{{ti.unit_test_info.get_last_val.value}}</td>-->
+                      
                       <td class="review-ref">
                         {% if ti.reference %}
                           {{ ti.reference.value_display }}
@@ -148,9 +145,9 @@
                       {% endif %}
                     {% endwith %}
                   {% endif %}
-                {% endif %}
-            <!-- {% endif %}      new end if to make sure it does not appear -->
-            <!-- {% endif %} -->
+                
+            {% endif %}     <!-- new end if to make sure it does not appear -->
+            
             
             {% endfor %}
           </tbody>
@@ -160,8 +157,7 @@
   </div>
   {% endfor %}
 </div>
-
-
+<div class="page-break"></div>
 
 {% for tli in queryset %}
 
@@ -179,8 +175,14 @@
 </div>
   {% for ti in tli.testinstance_set.all %}
     {% if ti.unit_test_info.test.body %}
+    <div class="row" >
+      <div class="col-xs-12">
+        <strong>{% trans "test divider" %}</strong>
+      </div>
+    </div>
+    <div>
       {{ti.string_value | safe}}
-
+    </div>
     {% endif %}
   {% endfor %}
 {% endfor %}

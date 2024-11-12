@@ -191,7 +191,7 @@ class TestListInstanceDetailsReport(BaseReport):
 
     category = _l("QC")
 
-    template = "reports/qc/testlistinstance_details_edited.html"  #!!!!!!!!!!!!!!!!!!!!!!!!!!! change back to standard
+    template = "reports/qc/Routine_qa_report.html"  #!!!!!!!!!!!!!!!!!!!!!!!!!!! change back to standard
 
     __test__ = False  # supress pytest warning
 
@@ -351,16 +351,12 @@ class TestListInstanceDetailsReport(BaseReport):
             ])
             rows.append(headers)
 
-            # past_values = []
-            # for ti, history in tli.history()[1]:
-            #     past_values.append(ti)
 
             for ti, history in tli.history()[0]:
                 if not ti.unit_test_info.test.hidden:
                     row = [
                         ti.unit_test_info.test.display_name,
                         ti.value_display(coerce_numerical=False),
-                        past_ti.value_display(coerce_numerical=False),
                         ti.reference.value_display() if ti.reference else "",
                         ti.tolerance.name if ti.tolerance else "",
                     ]

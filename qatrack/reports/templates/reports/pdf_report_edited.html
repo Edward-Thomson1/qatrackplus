@@ -26,6 +26,13 @@
           font-style: normal;
       }
     </style>
+    <style>
+      @media print {
+          .page-break {
+              page-break-before: always; /* or page-break-after: always; */
+          }
+      }
+    </style>
     <style type="text/css">
       {% include "reports/pdf.css" %}
     </style>
