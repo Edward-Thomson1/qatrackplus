@@ -11,4 +11,5 @@ from qatrack.reports.qc.testinstance import TestInstanceDetailsReport
 from qatrack.reports.qc.testlistinstance import (
     TestListInstanceDetailsReport,
     TestListInstanceSummaryReport,
+    RoutineQAReport,
 )

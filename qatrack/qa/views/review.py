@@ -25,7 +25,7 @@ from django.views.generic import (
 import pytz
 
 from qatrack.qatrack_core.dates import format_datetime
-from qatrack.reports.qc.testlistinstance import TestListInstanceDetailsReport
+from qatrack.reports.qc.testlistinstance import TestListInstanceDetailsReport,RoutineQAReport
 from qatrack.service_log.models import (
     ReturnToServiceQA,
     ServiceEvent,
@@ -70,6 +70,28 @@ class TestListInstanceDetails(PermissionRequiredMixin, TestListInstanceMixin, De
         return context
 
 
+# def test_list_instance_report(request, pk):
+
+#     tli = get_object_or_404(models.TestListInstance, id=pk)
+#     utc = tli.unit_test_collection
+#     wc = format_datetime(tli.work_completed)
+
+#     base_opts = {
+#         'report_type': TestListInstanceDetailsReport.report_type,
+#         'report_format': request.GET.get("type", "pdf"),
+#         'title': "%s - %s - %s" % (utc.unit.name, tli.test_list.name, wc),
+#         'include_signature': False,
+#         'visible_to': [],
+#     }
+
+#     report_opts = {
+#         'work_completed': "%s - %s" % (wc, wc),
+#         'unit_test_collection': [utc.id],
+#     }
+#     report = TestListInstanceDetailsReport(base_opts=base_opts, report_opts=report_opts, user=request.user)
+
+#     return report.render_to_response(base_opts['report_format'])
+
 def test_list_instance_report(request, pk):
 
     tli = get_object_or_404(models.TestListInstance, id=pk)
@@ -77,7 +99,7 @@ def test_list_instance_report(request, pk):
     wc = format_datetime(tli.work_completed)
 
     base_opts = {
-        'report_type': TestListInstanceDetailsReport.report_type,
+        'report_type': RoutineQAReport.report_type,
         'report_format': request.GET.get("type", "pdf"),
         'title': "%s - %s - %s" % (utc.unit.name, tli.test_list.name, wc),
         'include_signature': False,
@@ -88,7 +110,7 @@ def test_list_instance_report(request, pk):
         'work_completed': "%s - %s" % (wc, wc),
         'unit_test_collection': [utc.id],
     }
-    report = TestListInstanceDetailsReport(base_opts=base_opts, report_opts=report_opts, user=request.user)
+    report = RoutineQAReport(base_opts=base_opts, report_opts=report_opts, user=request.user)
 
     return report.render_to_response(base_opts['report_format'])
 

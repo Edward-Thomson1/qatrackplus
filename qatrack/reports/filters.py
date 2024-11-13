@@ -164,6 +164,27 @@ class TestListInstanceByUTCFilter(BaseReportFilterSet):
         self.form.fields['unit_test_collection'].choices = utc_choices()
 
 
+class TestListInstance_forroutineqa_Filter(BaseReportFilterSet):
+
+    unit_test_collection = django_filters.filters.MultipleChoiceFilter(
+        label=_l("Test List (Cycle) Assignment"),
+        help_text=_l("Select the Unit Test List (Cycle) Assignment)"),
+        required=True,
+    )
+
+    class Meta:
+        model = models.TestListInstance
+        fields = [
+            "unit_test_collection",]
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.form.fields['unit_test_collection'].choices = utc_choices()
+        
+
+
 class UnitTestCollectionFilter(BaseReportFilterSet):
 
     assigned_to = django_filters.filters.ModelMultipleChoiceFilter(

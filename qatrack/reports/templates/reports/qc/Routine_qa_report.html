@@ -19,6 +19,7 @@
     </div>
   </div>
   {% for tli in queryset %}
+
   <div class="row" >
     <div class="col-xs-12">
       {{tli.test_list.name}}
@@ -156,10 +157,12 @@
     </div>
   </div>
   {% endfor %}
+ 
 </div>
 <div class="page-break"></div>
 
 {% for tli in queryset %}
+
 
   {% if not forloop.first and report_format != "pdf" %}
     <hr/>
@@ -177,7 +180,7 @@
     {% if ti.unit_test_info.test.body %}
     <div class="row" >
       <div class="col-xs-12">
-        <strong>{% trans "test divider" %}</strong>
+        <strong>{{ti.unit_test_info.test.display_name}}</strong>
       </div>
     </div>
     <div>
@@ -185,6 +188,7 @@
     </div>
     {% endif %}
   {% endfor %}
+
 {% endfor %}
 
 {% endblock %}
