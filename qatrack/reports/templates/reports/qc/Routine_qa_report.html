@@ -159,17 +159,17 @@
   {% endfor %}
  
 </div>
-<div class="page-break"></div>
+
 
 {% for tli in queryset %}
-
+  
 
   {% if not forloop.first and report_format != "pdf" %}
     <hr/>
   {% endif %}
 
   <div {% if not forloop.first %}style="page-break-before: always; padding-top:20px;" {% endif %}>
-
+  <div class="page-break"></div>
   <div class="row" >
     <div class="col-xs-12">
       <strong>{{tli.test_list.name}}</strong>

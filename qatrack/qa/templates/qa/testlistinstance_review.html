@@ -322,117 +322,119 @@
                       {% endwith %}
 
                       {% with ti=ti_form.instance test=ti_form.instance.unit_test_info.test %}
-                        <tr class="qa-valuerow" data-prefix="{{ ti_form.prefix }}">
-                          <input type="hidden" name="testinstance_set-{{forloop.counter0}}-id" value="{{ti.pk}}" id="id_testinstance_set-{{forloop.counter0}}-id">
-                          <td class="bar-container test-name" title="{{ ti.unit_test_info.test.name }}"><div class="comment-bar"><div class="padding-left-5 padding-bottom-8" >{{ ti.unit_test_info.test.display }}</div></div></td>
-                          <td class="review-value">
+                        {% if not test.hidden %} <!-- added this for now -->
+                          <tr class="qa-valuerow" data-prefix="{{ ti_form.prefix }}">
+                            <input type="hidden" name="testinstance_set-{{forloop.counter0}}-id" value="{{ti.pk}}" id="id_testinstance_set-{{forloop.counter0}}-id">
+                            <td class="bar-container test-name" title="{{ ti.unit_test_info.test.name }}"><div class="comment-bar"><div class="padding-left-5 padding-bottom-8" >{{ ti.unit_test_info.test.display }}</div></div></td>
+                            <td class="review-value">
 
-                              {% with vd=ti.value_display %}
-                                <span class="label pass-fail {{ti.pass_fail}}" title="{% if ti.string_value %}{{vd|slice:"100"}}{% elif ti.diff_display %}{% trans "Diff from ref" %}={{ti.diff_display}}{%else%}{% trans "No ref/tol set" %}{% endif %}">
-                                  {% with ti.pass_fail as status %}
-                                    {% if ICON_SETTINGS.SHOW_STATUS_ICONS_REVIEW %}
-                                        {% if status == 'tolerance' %}
-                                            <i class="pull-left fa fa-exclamation-circle" aria-hidden="true"></i>
-                                        {% elif status == 'action' %}
-                                            <i class="pull-left fa fa-ban" aria-hidden="true"></i>
-                                        {% elif status == 'ok' %}
-                                            <i class="pull-left fa fa-check-circle-o" aria-hidden="true"></i>
-                                        {% elif status == 'not_done' %}
-                                            <i class="pull-left fa fa-circle-o" aria-hidden="true"></i>
-                                        {% endif %}
+                                {% with vd=ti.value_display %}
+                                  <span class="label pass-fail {{ti.pass_fail}}" title="{% if ti.string_value %}{{vd|slice:"100"}}{% elif ti.diff_display %}{% trans "Diff from ref" %}={{ti.diff_display}}{%else%}{% trans "No ref/tol set" %}{% endif %}">
+                                    {% with ti.pass_fail as status %}
+                                      {% if ICON_SETTINGS.SHOW_STATUS_ICONS_REVIEW %}
+                                          {% if status == 'tolerance' %}
+                                              <i class="pull-left fa fa-exclamation-circle" aria-hidden="true"></i>
+                                          {% elif status == 'action' %}
+                                              <i class="pull-left fa fa-ban" aria-hidden="true"></i>
+                                          {% elif status == 'ok' %}
+                                              <i class="pull-left fa fa-check-circle-o" aria-hidden="true"></i>
+                                          {% elif status == 'not_done' %}
+                                              <i class="pull-left fa fa-circle-o" aria-hidden="true"></i>
+                                          {% endif %}
+                                      {% endif %}
+                                    {% endwith %}
+                                    {% if test.is_upload %}
+                                        <a href="#!" style="color: white" class="revealtext" title="{% trans "Click to show full results" %}"><i class="fa fa-book"></i></a>
+                                    {% elif vd|length > 100 %}
+                                      <a href="#!" style="color: white" class="revealtext" title="{{ vd|slice:"100" }}...{% trans "Click to show full text" %}"><i class="fa fa-book"></i></a>
+                                    {% else %}
+                                      {{ti.value_display|safe}}
                                     {% endif %}
-                                  {% endwith %}
-                                  {% if test.is_upload %}
-                                      <a href="#!" style="color: white" class="revealtext" title="{% trans "Click to show full results" %}"><i class="fa fa-book"></i></a>
-                                  {% elif vd|length > 100 %}
-                                    <a href="#!" style="color: white" class="revealtext" title="{{ vd|slice:"100" }}...{% trans "Click to show full text" %}"><i class="fa fa-book"></i></a>
-                                  {% else %}
-                                    {{ti.value_display|safe}}
-                                  {% endif %}
-                                </span>
-                              {% endwith %}
-                          </td>
-                          <td class="review-ref">
-                            {% reference_tolerance_span ti.unit_test_info.test ti.reference ti.tolerance%}
-                          </td>
-                          {% if REVIEW_DIFF_COL %}
-                            <td class="review-diff">
-                              {% if not ti.string_value %}{{ti.diff_display}}{% endif %}
+                                  </span>
+                                {% endwith %}
                             </td>
-                          {% endif %}
-                          <td class="qa-showcmt">
-                            {% if ti.comment %}
-                              <a href="#!" class="revealcomment" title="{{ ti.comment }}"><i class="fa fa-commenting"></i></a>
+                            <td class="review-ref">
+                              {% reference_tolerance_span ti.unit_test_info.test ti.reference ti.tolerance%}
+                            </td>
+                            {% if REVIEW_DIFF_COL %}
+                              <td class="review-diff">
+                                {% if not ti.string_value %}{{ti.diff_display}}{% endif %}
+                              </td>
                             {% endif %}
-                          </td>
-                          <td class="qa-history">
-                            {% history_display ti_form.history test_list_instance.unit_test_collection.unit test_list_instance.test_list ti.unit_test_info.test unit_test_collection.frequency %}
-                          </td>
-                          {% if perms.qa.can_review %}
-                            {# note we render this manually to prevent the Django ORM from running a query for every form #}
+                            <td class="qa-showcmt">
+                              {% if ti.comment %}
+                                <a href="#!" class="revealcomment" title="{{ ti.comment }}"><i class="fa fa-commenting"></i></a>
+                              {% endif %}
+                            </td>
+                            <td class="qa-history">
+                              {% history_display ti_form.history test_list_instance.unit_test_collection.unit test_list_instance.test_list ti.unit_test_info.test unit_test_collection.frequency %}
+                            </td>
+                            {% if perms.qa.can_review %}
+                              {# note we render this manually to prevent the Django ORM from running a query for every form #}
+                              <td class="review-status">
+                                  <select name="testinstance_set-{{forloop.counter0}}-status" id="id_testinstance_set-{{forloop.counter0}}-status" class="input-medium">
+                                    {% for status in statuses %}
+                                      <option
+                                        title="{% if status.description %}{{status.description}}{% else %}{% trans "No description available" %}{%endif%}"
+                                        value="{{ status.pk }}"
+                                        {% if ti.status == status %}selected="selected"{% endif %}
+                                      >
+                                        {{ status.name }}
+                                      </option>
+                                    {% endfor %}
+                                  </select>
+                              </td>
+                            {% else %}
                             <td class="review-status">
-                                <select name="testinstance_set-{{forloop.counter0}}-status" id="id_testinstance_set-{{forloop.counter0}}-status" class="input-medium">
-                                  {% for status in statuses %}
-                                    <option
-                                      title="{% if status.description %}{{status.description}}{% else %}{% trans "No description available" %}{%endif%}"
-                                      value="{{ status.pk }}"
-                                      {% if ti.status == status %}selected="selected"{% endif %}
-                                    >
-                                      {{ status.name }}
-                                    </option>
-                                  {% endfor %}
-                                </select>
+                              {{ ti.status.name }}
                             </td>
-                          {% else %}
-                          <td class="review-status">
-                            {{ ti.status.name }}
-                          </td>
-                          {% endif %}
-                          {% if perms.qa.can_review %}
-                            <td class="review-selected"><input class="test-selected" type="checkbox" checked="checked"/></td>
-                          {% endif %}
-                        </tr>
-                        {% if ti.comment %}
-                          <tr class="qa-comment no-hover row-{{ ti_form.prefix }}">
-                            <td colspan="{% qa_table_colspan perms %}"  class="">
-                              <div class="comment-container comment-bar">
-                                <div class="comment-div">
-                                  {{ ti.comment }}
+                            {% endif %}
+                            {% if perms.qa.can_review %}
+                              <td class="review-selected"><input class="test-selected" type="checkbox" checked="checked"/></td>
+                            {% endif %}
+                          </tr>
+                          {% if ti.comment %}
+                            <tr class="qa-comment no-hover row-{{ ti_form.prefix }}">
+                              <td colspan="{% qa_table_colspan perms %}"  class="">
+                                <div class="comment-container comment-bar">
+                                  <div class="comment-div">
+                                    {{ ti.comment }}
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                          </tr>
-                        {% endif %}
-                        {% if not test.is_upload and ti.string_value|length > 100 %}
-                          <tr class="qa-text-display no-hover row-{{ ti_form.prefix }} hidden">
-                            <td colspan="{% qa_table_colspan perms %}"  class="">
-                            <pre style="">
-                              {{ ti.value_display }}
-                            </pre>
-                            </td>
-                          </tr>
-                        {% elif test.is_upload %}
-                          <tr class="qa-text-display no-hover row-{{ ti_form.prefix }} hidden">
-                            <td colspan="{% qa_table_colspan perms %}"  class="">
-                            <pre style="">
-                              {% firstof ti.json_value|pprint "" %}
-                            </pre>
-                            </td>
-                          </tr>
-                        {% endif %}
+                              </td>
+                            </tr>
+                          {% endif %}
+                          {% if not test.is_upload and ti.string_value|length > 100 %}
+                            <tr class="qa-text-display no-hover row-{{ ti_form.prefix }} hidden">
+                              <td colspan="{% qa_table_colspan perms %}"  class="">
+                              <pre style="">
+                                {{ ti.value_display }}
+                              </pre>
+                              </td>
+                            </tr>
+                          {% elif test.is_upload %}
+                            <tr class="qa-text-display no-hover row-{{ ti_form.prefix }} hidden">
+                              <td colspan="{% qa_table_colspan perms %}"  class="">
+                              <pre style="">
+                                {% firstof ti.json_value|pprint "" %}
+                              </pre>
+                              </td>
+                            </tr>
+                          {% endif %}
 
-                        {% if ti.attachment_set.exists %}
-                          <tr class="qa-attach no-hover">
-                            <td>{{ti.unit_test_info.test}} {% trans "Attachments" %}</td>
-                            <td colspan="{% qa_table_colspan perms offset=1 %}"  class="">
-                              <ul>
-                                {% for attach in ti.attachment_set.all %}
-                                  <li>{{ attach | attachment_link }}</li>
-                                {% endfor %}
-                            </ul>
-                            </td>
-                          </tr>
-                        {% endif %}
+                          {% if ti.attachment_set.exists %}
+                            <tr class="qa-attach no-hover">
+                              <td>{{ti.unit_test_info.test}} {% trans "Attachments" %}</td>
+                              <td colspan="{% qa_table_colspan perms offset=1 %}"  class="">
+                                <ul>
+                                  {% for attach in ti.attachment_set.all %}
+                                    <li>{{ attach | attachment_link }}</li>
+                                  {% endfor %}
+                              </ul>
+                              </td>
+                            </tr>
+                          {% endif %}
+                        {% endif %}  <!-- added this for now -->
                       {%endwith%}
 
                       {% if not forloop.last and borders.ends|lookup:forloop.counter0 %}
