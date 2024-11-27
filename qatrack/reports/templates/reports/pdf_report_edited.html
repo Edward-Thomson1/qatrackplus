@@ -27,6 +27,21 @@
       }
     </style>
     <style>
+      header {
+          page-break-before: always; 
+          position: fixed;
+          top: 0px;
+          left: 0px;
+          right: 0px;
+          height: 20px;
+          background-color:white;
+          color: black;
+          text-align: left;
+          line-height: 16px;
+          padding: 5px
+      }
+  </style>
+    <style>
       @media print {
           .page-break {
               page-break-before: always; 
@@ -35,8 +50,8 @@
     </style>
     <style>
       .styled-div { 
-          border-bottom: 1px solid gray; 
-          padding: 1px; 
+          border-bottom: 0.5px solid gray; 
+          padding: 0.5px; 
       }
     </style>
     <style>
@@ -60,6 +75,7 @@
 
       <div class="row">
         <div id="report-content" class="col-xs-12">
+        
 
           {% block content %}
           {% endblock content %}

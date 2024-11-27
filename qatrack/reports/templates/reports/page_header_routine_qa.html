@@ -6,11 +6,17 @@
 {% load attach_tags %}
 {% load comments %}
 
+{% for utc in utcs %}
+{% for tli in queryset %}
+
 
 <div class="row">
   <div class="col-xs-8">
-    <h1 style="color:#777; margin-top: 20px; " class="pdf">{% trans "Routine Physics QA Report" %}</h1>
-    <h5 style="color: #1c9aea; font-weight: bold; padding-left: 4px;">{{ report_title }}</h5>
+    <strong>{{ report_title }}</strong><br>
+    <strong> {{utc.unit.type.vendor}} {{utc.unit.type.model}} </strong><br>
+
+    <strong>{% trans "Visit Date" %}: </strong>{{ tli.work_completed |date:"d M Y" }}<br>
+    <strong>{% trans "Report Date" %}:</strong>{% now "d M Y" %}<br>
   </div>
   <div class="col-xs-4">
       <img src="file://H:\python_tests\qa_form_processing\logoBH.bmp" width="240" height="60">
@@ -22,3 +28,6 @@
     <hr style="padding-top: 0; margin-top: 5px;" class="tight"/>
   </div>
 </div>
+
+{% endfor %}
+{% endfor %}

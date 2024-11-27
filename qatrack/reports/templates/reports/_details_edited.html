@@ -1,24 +1,39 @@
 {% load i18n %}
 
+{% for utc in utcs %}
+{% for tli in queryset %}
+
 <div class="row">
   <div class="col-xs-6">
-    <strong>{% trans "Report Information" %} :</strong>
+    <strong>{% trans "Equipment Identification" %} :</strong>
     <dl class="dl-horizontal">
 
-      <dt>{% trans "Report Type" %}:</dt>
-      <dd>{{ report_name }}</dd>
+      <dt>{% trans "Department" %}:</dt>
+      <dd>{{ utc.unit.department }}</dd>
 
-      <dt>{% trans "Generated" %}:</dt>
-      <dd>{% now "d M Y H:i:s" %}</dd>
+      <dt>{% trans "Room" %}:</dt>
+      <dd>{{ utc.unit.name }}</dd>
+
+      <dt>{% trans "MES Provider" %}:</dt>
+      <dd>{{ utc.unit.mes_provider }}</dd>
+
+      <dt>{% trans "Equip Number" %}:</dt>
+      <dd>{{ utc.unit.number }}</dd>
 
       {% if report_url %}
       <dt>{% trans "View on site" %}:</dt>
         <dd>
           <a href="{{ report_url }}" title="{% trans "View Report on Site" %}">
-            {{ report_title }}
+            {{ utc.unit.department }}
           </a>
         </dd>
       {% endif %}
+
+      <dt>{% trans "Visit Date" %}:</dt>
+      <dd>{{ tli.work_completed |date:"d M Y" }}</dd>
+
+      <dt>{% trans "Report Date" %}:</dt>
+      <dd>{% now "d M Y" %}</dd>
 
       <dt>{% trans "Report Description" %}:</dt>
       <dd>{{ report_description }}</dd>
@@ -26,11 +41,36 @@
     </dl>
   </div>
   <div class="col-xs-6">
-    <strong>{% trans "Filter Details" %} ::</strong>
+    <strong>{% trans "Equipment Details" %} :</strong>
     <dl class="dl-horizontal">
-      {% for label, criteria in report_details %}
-        <dt>{{ label }}:</dt>
-        <dd>{{ criteria | safe }}</dd>
+      <dt><strong>{% trans "System" %}</strong></dt>
+      <dd></dd>
+      <dt>{% trans "Vendor" %}:</dt>
+      <dd>{{ utc.unit.type.vendor }}</dd>
+
+      <dt>{% trans "Model" %}:</dt>
+      <dd>{{ utc.unit.type.model }}</dd>
+
+      <dt>{% trans "System ID" %}:</dt>
+      <dd>{{ utc.unit.serial_number }}</dd>
+
+      <dt>{% trans "Manufactured Date" %}:</dt>
+      <dd> need to do </dd>
+
+      <dt>{% trans "Installation Date" %}:</dt>
+      <dd>{{ utc.unit.install_date }}</dd>
+
+      {% for part in utc.unit.parts.all %}
+        <dt><strong>{{ part.name }}</strong></dt>
+        <dd></dd>
+        <dt>{% trans "Vendor" %}:</dt>
+        <dd>{{ part.vendor }}</dd>
+
+        <dt>{% trans "Model" %}:</dt>
+        <dd>{{ part.model }}</dd>
+
+        <dt>{% trans "System ID" %}:</dt>
+        <dd>{{ part.Serial_number }}</dd>
       {% endfor %}
     </dl>
   </div>
@@ -40,3 +80,6 @@
     <hr style="padding-top: 0; margin-top: 5px;" class="tight"/>
   </div>
 </div>
+
+{% endfor %}
+{% endfor %}

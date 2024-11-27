@@ -378,6 +378,15 @@ class TestListInstanceDetailsReport(BaseReport):
 
 class RoutineQAReport(BaseReport):
 
+    # base_opts = {
+    #     'report_type': RoutineQAReport.report_type,
+    #     'report_format': request.GET.get("type", "pdf"),
+    #     'title': "%s - %s - %s" % (utc.unit.name, tli.test_list.name, wc),
+    #     'include_signature': False,
+    #     'visible_to': [],
+    # }
+
+
     report_type = "routineqa_report"
     name = _l("Routine QA Report")
     filter_class = filters.TestListInstanceByUTCFilter
@@ -445,18 +454,6 @@ class RoutineQAReport(BaseReport):
         ).order_by("-work_completed")
 
         
-        #context['queryset'] = qs
-
-    #         report_opts = {
-            #     'work_completed': "%s - %s" % (wc, wc),
-            #     'unit_test_collection': [utc.id],
-            # }
-            # report = RoutineQAReport(base_opts=base_opts, report_opts=report_opts, user=request.user)
-
-        #print(len(qs.distinct("unit_test_collection")))
-        #print([tli.work_completed for tli in qs])
-
-        # an inefficient way to get rid of older testlists. there must be a better way!
         
         if len(qs) > 1:
             change = []
@@ -471,9 +468,6 @@ class RoutineQAReport(BaseReport):
         else:
             context['queryset'] = qs
         
-        # print(qs)
-        # print(dir(qs))
-        # print(len(qs))
         
 
         form = self.get_filter_form()

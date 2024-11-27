@@ -11,7 +11,7 @@
 
 
 
-<div {% if not forloop.first %}style="page-break-before: always; padding-top:20px;" {% endif %}>
+<div {% if not forloop.first %}style="page-break-before: always; padding-top:40px;" {% endif %}>
 
   <div class="row" >
     <div class="col-xs-12">
@@ -160,6 +160,8 @@
  
 </div>
 
+<div class="page-break"></div>
+<!-- <div id="H:\deploy\qatrackplus\qatrack\reports\templates\reports\page_header_routine_qa.html"></div> -->
 
 {% for tli in queryset %}
   
@@ -169,7 +171,7 @@
   {% endif %}
 
   <div {% if not forloop.first %}style="page-break-before: always; padding-top:20px;" {% endif %}>
-  <div class="page-break"></div>
+  
   <div class="row" >
     <div class="col-xs-12">
       <strong>{{tli.test_list.name}}</strong>

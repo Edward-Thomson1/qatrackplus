@@ -101,7 +101,7 @@ def test_list_instance_report(request, pk):
     base_opts = {
         'report_type': RoutineQAReport.report_type,
         'report_format': request.GET.get("type", "pdf"),
-        'title': "%s - %s - %s" % (utc.unit.name, tli.test_list.name, wc),
+        'title': "%s - %s" % (utc.unit.department, utc.unit.location),
         'include_signature': False,
         'visible_to': [],
     }
