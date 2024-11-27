@@ -30,6 +30,8 @@ def chrometopdf(html, name=""):
             '--disable-gpu',
             '--no-sandbox',
             '--print-to-pdf=%s' % out_path,
+            "--virtual-time-budget=10",  # add this line
+            "--run-all-compositor-stages-before-draw",  # and this line
             "file://%s" % tmp_html.name,
         ]
 
